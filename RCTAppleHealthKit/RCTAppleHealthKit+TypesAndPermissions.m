@@ -75,6 +75,8 @@
         return [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierAppleStandTime];
     } else if ([@"AppleExerciseTime" isEqualToString: key] && systemVersion >= 9.3) {
         return [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierAppleExerciseTime];
+    } else if ([@"WalkingAsymmetryPercentage" isEqualToString: key] && systemVersion >= 13.0) {
+        return [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierWalkingAsymmetry];
     }
 
     // Nutrition Identifiers

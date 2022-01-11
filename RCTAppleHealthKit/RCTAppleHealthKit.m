@@ -284,6 +284,17 @@ RCT_EXPORT_METHOD(getDailyFlightsClimbedSamples:(NSDictionary *)input callback:(
     [self _initializeHealthStore];
     [self fitness_getDailyFlightsClimbedSamples:input callback:callback];
 }
+RCT_EXPORT_METHOD(getWalkingAsymmetryPercentage:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback)
+{
+    [self _initializeHealthStore];
+    [self fitness_getWalkingAsymmetryPercentageOnDay:input callback:callback];
+}
+
+RCT_EXPORT_METHOD(getDailyWalkingAsymmetryPercentageSamples:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback)
+{
+    [self _initializeHealthStore];
+    [self fitness_getDailyWalkingAsymmetryPercentageSamples:input callback:callback];
+}
 
 RCT_EXPORT_METHOD(getEnergyConsumedSamples:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback)
 {
