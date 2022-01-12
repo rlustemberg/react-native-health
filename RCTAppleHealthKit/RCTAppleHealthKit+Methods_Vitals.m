@@ -198,11 +198,20 @@
             for (HKHeartbeatSeriesSample *sample in results) {
                 NSString *startDateString = [RCTAppleHealthKit buildISO8601StringFromDate:sample.startDate];
                 NSString *endDateString = [RCTAppleHealthKit buildISO8601StringFromDate:sample.endDate];
-                
+                NSString* device = @"";
+                if (@available(iOS 11.0, *)) {
+                    device = [[sample sourceRevision] productType];
+                } else {
+                    device = [[sample device] name];
+                    if (!device) {
+                        device = @"iPhone";
+                    }
+                }
                 NSDictionary *elem = @{
                      @"id" : [[sample UUID] UUIDString],
                      @"sourceName" : [[[sample sourceRevision] source] name],
                      @"sourceId" : [[[sample sourceRevision] source] bundleIdentifier],
+                     @"device": device,
                      @"startDate" : startDateString,
                      @"endDate" : endDateString,
                      @"heartbeatSeries": @[]

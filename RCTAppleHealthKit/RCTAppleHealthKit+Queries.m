@@ -50,6 +50,68 @@
     ];
     [self.healthStore executeQuery:query];
 }
+- (void)fetchMostRecentDiscreteQuantitySampleOfType:(HKQuantityType *)quantityType
+                                  unit:(HKUnit *)unit
+                                  predicate:(NSPredicate *)predicate
+                                  completion:(void (^)(NSDictionary *, NSError *error))completion {
+
+    NSSortDescriptor *timeSortDescriptor = [[NSSortDescriptor alloc]
+            initWithKey:HKSampleSortIdentifierEndDate
+              ascending:NO
+    ];
+
+    HKSampleQuery *query = [[HKSampleQuery alloc]
+            initWithSampleType:quantityType
+                     predicate:predicate
+                         limit:1
+               sortDescriptors:@[timeSortDescriptor]
+                resultsHandler:^(HKSampleQuery *query, NSArray *results, NSError *error) {
+
+                      if (!results) {
+                          if (completion) {
+                              completion( nil, error);
+                          }
+                          return;
+                      }
+
+                      if (completion) {
+                          // If quantity isn't in the database, return nil in the completion block.
+                          HKQuantitySample *sample = results.firstObject;
+                          HKQuantity *quantity = sample.quantity;
+                          double value = [quantity doubleValueForUnit: unit];
+
+                          NSString *startDateString = [RCTAppleHealthKit buildISO8601StringFromDate:sample.startDate];
+                          NSString *endDateString = [RCTAppleHealthKit buildISO8601StringFromDate:sample.endDate];
+                          NSString* device = @"";
+                          if (@available(iOS 11.0, *)) {
+                              device = [[sample sourceRevision] productType];
+                          } else {
+                              device = [[sample device] name];
+                              if (!device) {
+                                  device = @"iPhone";
+                              }
+                          }
+
+                          NSMutableDictionary *elem = [NSMutableDictionary dictionaryWithDictionary:@{
+                                  @"value" : @(value),
+                                  @"id" : [[sample UUID] UUIDString],
+                                  @"sourceName" : [[[sample sourceRevision] source] name],
+                                  @"sourceId" : [[[sample sourceRevision] source] bundleIdentifier],
+                                  @"device": device,
+                                  @"startDate" : startDateString,
+                                  @"endDate" : endDateString,
+                          }];
+
+                          NSDictionary *metadata = [sample metadata];
+                          if (metadata) {
+                              [elem setValue:metadata forKey:kMetadataKey];
+                          }
+                          completion(elem, error);
+                      }
+                }
+    ];
+    [self.healthStore executeQuery:query];
+}
 
 - (void)fetchQuantitySamplesOfType:(HKQuantityType *)quantityType
                               unit:(HKUnit *)unit
@@ -83,12 +145,22 @@
 
                     NSString *startDateString = [RCTAppleHealthKit buildISO8601StringFromDate:sample.startDate];
                     NSString *endDateString = [RCTAppleHealthKit buildISO8601StringFromDate:sample.endDate];
+                    NSString* device = @"";
+                    if (@available(iOS 11.0, *)) {
+                        device = [[sample sourceRevision] productType];
+                    } else {
+                        device = [[sample device] name];
+                        if (!device) {
+                            device = @"iPhone";
+                        }
+                    }
 
                     NSMutableDictionary *elem = [NSMutableDictionary dictionaryWithDictionary:@{
                             @"value" : @(value),
                             @"id" : [[sample UUID] UUIDString],
                             @"sourceName" : [[[sample sourceRevision] source] name],
                             @"sourceId" : [[[sample sourceRevision] source] bundleIdentifier],
+                            @"device": device,
                             @"startDate" : startDateString,
                             @"endDate" : endDateString,
                     }];
@@ -442,10 +514,20 @@
                         valueString = @"UNKNOWN";
                      break;
                   }
+                    NSString* device = @"";
+                    if (@available(iOS 11.0, *)) {
+                        device = [[sample sourceRevision] productType];
+                    } else {
+                        device = [[sample device] name];
+                        if (!device) {
+                            device = @"iPhone";
+                        }
+                    }
 
                     NSDictionary *elem = @{
                             @"id" : [[sample UUID] UUIDString],
                             @"value" : valueString,
+                            @"device": device,
                             @"startDate" : startDateString,
                             @"endDate" : endDateString,
                             @"sourceName" : [[[sample sourceRevision] source] name],
@@ -626,7 +708,6 @@
 
     [self.healthStore executeQuery:query];
 }
-
 - (void)fetchCumulativeSumStatisticsCollection:(HKQuantityType *)quantityType
                                           unit:(HKUnit *)unit
                                      startDate:(NSDate *)startDate

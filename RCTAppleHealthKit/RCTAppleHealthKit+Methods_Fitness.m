@@ -413,61 +413,55 @@
                                       }];
 }
 
-- (void)fitness_getWalkingAsymmetryPercentageOnDay:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback
+- (void)fitness_getLatestWalkingAsymmetryPercentage:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback
 {
-    HKUnit *unit = [HKUnit countUnit];
-    NSDate *date = [RCTAppleHealthKit dateFromOptions:input key:@"date" withDefault:[NSDate date]];
-    BOOL includeManuallyAdded = [RCTAppleHealthKit boolFromOptions:input key:@"includeManuallyAdded" withDefault:true];
+    HKQuantityType *walkingAsymmetryPercentage = [HKQuantityType quantityTypeForIdentifier: HKQuantityTypeIdentifierWalkingAsymmetryPercentage];
+    HKUnit *countUnit = [HKUnit percentUnit];
 
-    HKQuantityType *quantityType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierWalkingAsymmetry];
-
-    [self fetchSumOfSamplesOnDayForType:quantityType unit:unit includeManuallyAdded:includeManuallyAdded day:date completion:^(double count, NSDate *startDate, NSDate *endDate, NSError *error) {
-        if (!count && count != 0) {
+    [self fetchMostRecentDiscreteQuantitySampleOfType:walkingAsymmetryPercentage
+                                    unit:(HKUnit *)countUnit
+                                    predicate:nil
+                                   completion:^(NSDictionary *result, NSError *error) {
+        if (!result) {
             callback(@[RCTJSErrorFromNSError(error)]);
-            return;
         }
+        else {
+            
 
-        NSDictionary *response = @{
-                @"value" : @(count),
-                @"startDate" : [RCTAppleHealthKit buildISO8601StringFromDate:startDate],
-                @"endDate" : [RCTAppleHealthKit buildISO8601StringFromDate:endDate],
-        };
-
-        callback(@[[NSNull null], response]);
+            callback(@[[NSNull null], result]);
+        }
     }];
 }
 
-- (void)fitness_getDailyWalkingAsymmetryPercentageSamples:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback
+- (void)fitness_getWalkingAsymmetryPercentageSamples:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback
 {
-    HKUnit *unit = [RCTAppleHealthKit hkUnitFromOptions:input key:@"unit" withDefault:[HKUnit countUnit]];
+    HKQuantityType *WalkingAsymmetryPercentage = [HKQuantityType quantityTypeForIdentifier: HKQuantityTypeIdentifierWalkingAsymmetryPercentage];
+
+    HKUnit *countUnit = [HKUnit percentUnit];
     NSUInteger limit = [RCTAppleHealthKit uintFromOptions:input key:@"limit" withDefault:HKObjectQueryNoLimit];
     BOOL ascending = [RCTAppleHealthKit boolFromOptions:input key:@"ascending" withDefault:false];
     NSDate *startDate = [RCTAppleHealthKit dateFromOptions:input key:@"startDate" withDefault:nil];
     NSDate *endDate = [RCTAppleHealthKit dateFromOptions:input key:@"endDate" withDefault:[NSDate date]];
-    NSUInteger period = [RCTAppleHealthKit uintFromOptions:input key:@"period" withDefault:60];
-    BOOL includeManuallyAdded = [RCTAppleHealthKit boolFromOptions:input key:@"includeManuallyAdded" withDefault:true];
     if(startDate == nil){
         callback(@[RCTMakeError(@"startDate is required in options", nil, nil)]);
         return;
     }
+    NSPredicate * predicate = [RCTAppleHealthKit predicateForSamplesBetweenDates:startDate endDate:endDate];
 
-    HKQuantityType *quantityType = [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierWalkingAsymmetry];
-
-    [self fetchCumulativeSumStatisticsCollection:quantityType
-                                            unit:unit
-                                          period:period
-                                       startDate:startDate
-                                         endDate:endDate
-                                       ascending:ascending
-                                           limit:limit
-                            includeManuallyAdded:includeManuallyAdded
-                                      completion:^(NSArray *arr, NSError *err){
-                                          if (err != nil) {
-                                              callback(@[RCTJSErrorFromNSError(err)]);
-                                              return;
-                                          }
-                                          callback(@[[NSNull null], arr]);
-                                      }];
+    [self fetchQuantitySamplesOfType:WalkingAsymmetryPercentage
+                                unit:countUnit
+                           predicate:predicate
+                           ascending:ascending
+                               limit:limit
+                          completion:^(NSArray *results, NSError *error) {
+        if(results){
+          callback(@[[NSNull null], results]);
+          return;
+        } else {
+          callback(@[RCTJSErrorFromNSError(error)]);
+          return;
+        }
+    }];
 }
 
 /*!

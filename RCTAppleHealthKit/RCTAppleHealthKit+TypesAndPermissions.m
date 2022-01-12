@@ -72,11 +72,19 @@
     } else if ([@"NikeFuel" isEqualToString: key]) {
         return [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierNikeFuel];
     } else if ([@"AppleStandTime" isEqualToString: key]) {
-        return [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierAppleStandTime];
+        if (@available(iOS 13.0, *)) {
+            return [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierAppleStandTime];
+        } else {
+            // Fallback on earlier versions
+        }
     } else if ([@"AppleExerciseTime" isEqualToString: key] && systemVersion >= 9.3) {
         return [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierAppleExerciseTime];
-    } else if ([@"WalkingAsymmetryPercentage" isEqualToString: key] && systemVersion >= 13.0) {
-        return [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierWalkingAsymmetry];
+    } else if ([@"WalkingAsymmetryPercentage" isEqualToString: key] ) {
+        if (@available(iOS 14.0, *)) {
+            return [HKObjectType quantityTypeForIdentifier:HKQuantityTypeIdentifierWalkingAsymmetryPercentage];
+        } else {
+            // Fallback on earlier versions
+        }
     }
 
     // Nutrition Identifiers

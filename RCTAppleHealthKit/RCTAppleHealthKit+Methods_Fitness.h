@@ -23,8 +23,8 @@
 - (void)fitness_getDailyDistanceCyclingSamples:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback;
 - (void)fitness_getFlightsClimbedOnDay:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback;
 - (void)fitness_getDailyFlightsClimbedSamples:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback;
-- (void)fitness_getWalkingAsymmetryPercentageOnDay:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback;
-- (void)fitness_getDailyWalkingAsymmetryPercentageSamples:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback;
+- (void)fitness_getLatestWalkingAsymmetryPercentage:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback;
+- (void)fitness_getWalkingAsymmetryPercentageSamples:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback;
 
 - (void)fitness_setObserver:(NSDictionary *)input __deprecated;
 - (void)fitness_registerObserver:(NSString *)type

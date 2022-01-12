@@ -14,6 +14,11 @@
                                   predicate:(NSPredicate *)predicate
                                  completion:(void (^)(HKQuantity *mostRecentQuantity, NSDate *startDate, NSDate *endDate, NSError *error))completion;
 
+- (void)fetchMostRecentDiscreteQuantitySampleOfType:(HKQuantityType *)quantityType
+                                  unit:(HKUnit *)unit
+                                  predicate:(NSPredicate *)predicate
+                                  completion:(void (^)(NSDictionary *sample, NSError *error ))completion;
+
 - (void)fetchSumOfSamplesTodayForType:(HKQuantityType *)quantityType
                                  unit:(HKUnit *)unit
                            completion:(void (^)(double, NSError *))completionHandler;

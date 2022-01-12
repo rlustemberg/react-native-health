@@ -284,16 +284,16 @@ RCT_EXPORT_METHOD(getDailyFlightsClimbedSamples:(NSDictionary *)input callback:(
     [self _initializeHealthStore];
     [self fitness_getDailyFlightsClimbedSamples:input callback:callback];
 }
-RCT_EXPORT_METHOD(getWalkingAsymmetryPercentage:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback)
+RCT_EXPORT_METHOD(getLatestWalkingAsymmetryPercentage:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback)
 {
     [self _initializeHealthStore];
-    [self fitness_getWalkingAsymmetryPercentageOnDay:input callback:callback];
+    [self fitness_getLatestWalkingAsymmetryPercentage:input callback:callback];
 }
 
-RCT_EXPORT_METHOD(getDailyWalkingAsymmetryPercentageSamples:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback)
+RCT_EXPORT_METHOD(getWalkingAsymmetryPercentageSamples:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback)
 {
     [self _initializeHealthStore];
-    [self fitness_getDailyWalkingAsymmetryPercentageSamples:input callback:callback];
+    [self fitness_getWalkingAsymmetryPercentageSamples:input callback:callback];
 }
 
 RCT_EXPORT_METHOD(getEnergyConsumedSamples:(NSDictionary *)input callback:(RCTResponseSenderBlock)callback)
@@ -632,7 +632,9 @@ RCT_EXPORT_METHOD(getClinicalRecords:(NSDictionary *)input callback:(RCTResponse
         @"MedicationRecord",
         @"ProcedureRecord",
         @"VitalSignRecord",
-        @"SleepAnalysis"
+        @"SleepAnalysis",
+        @"WalkingAsymmetryPercentage",
+        @"HeartbeatSeries"
     ];
     
     NSArray *templates = @[@"healthKit:%@:new", @"healthKit:%@:failure", @"healthKit:%@:enabled", @"healthKit:%@:sample", @"healthKit:%@:setup:success", @"healthKit:%@:setup:failure"];
@@ -723,12 +725,14 @@ RCT_EXPORT_METHOD(getClinicalRecords:(NSDictionary *)input callback:(RCTResponse
             @"HeartRate",
             @"HeartRateVariabilitySDNN",
             @"RestingHeartRate",
+            @"HeartbeatSeries",
             @"Running",
             @"StairClimbing",
             @"StepCount",
             @"Swimming",
             @"Vo2Max",
             @"Walking",
+            @"WalkingAsymmetryPercentage",
             @"Workout",
             @"MindfulSession",
             @"SleepAnalysis",
